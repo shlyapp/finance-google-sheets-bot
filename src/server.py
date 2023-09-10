@@ -60,6 +60,10 @@ async def choose_entry_category(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=States.ENTER_PRICE)
 async def enter_entry_price(message: types.Message, state: FSMContext):
+    while not message.text.isdigit():
+        await message.reply("Некорректный ввод. Пожалуйста, введите число: ")
+        return
+
     async with state.proxy() as data:
         data['price'] = message.text
         add_entry(message.from_user.full_name, message.date, data)
