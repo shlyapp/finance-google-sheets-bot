@@ -13,6 +13,15 @@ worksheet = spreadsheet.sheet1
 
 
 def add_entry(user_name, data):
-    row = [user_name, data['type'], data['category'], data['price']]
+    row = [user_name, data['type'], data['category'], int(data['price'])]
     worksheet.append_row(row)
 
+
+def show_entrys():
+    entrys = worksheet.get_all_values()
+    output = ""
+    if len(entrys) > 1:
+        for entry in entrys[-5:]:
+            output += ' - '.join(entry) + '\n'
+   
+    return output
