@@ -62,7 +62,7 @@ async def choose_entry_category(message: types.Message, state: FSMContext):
 async def enter_entry_price(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['price'] = message.text
-        add_entry(message.from_user.full_name, data)
+        add_entry(message.from_user.full_name, message.date, data)
 
     await message.answer('Запись занесена!', reply_markup=action_keyboard)
 
