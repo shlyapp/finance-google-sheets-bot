@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 
 from states import States
-from entry import add_entry
+from entry import add_entry, show_entrys
 from keyboards import action_keyboard, entry_keyboard, sale_category_keyboard, purchase_category_keyboard
 
 
@@ -21,7 +21,10 @@ async def send_welcome(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def send_command_list(message: types.Message):
-    await message.answer('')
+    await message.answer('Список комманд, который я могу выполнять:\n' 
+                         + '/start - запустить бота\n'
+                         + '/new - добавить новую запись\n'
+                         + '/list - вывести записи')
 
 
 @dp.message_handler(text='Внести запись')
@@ -70,7 +73,9 @@ async def enter_entry_price(message: types.Message, state: FSMContext):
 @dp.message_handler(text='Посмотреть записи')
 @dp.message_handler(commands=['list'])
 async def show_list_entry(message: types.Message):
-    await message.answer('Список записей')
+    await message.answer('Последние 5 записей:\n' 
+                         + f'{show_entrys()}\n'
+                         + 'Вся таблица:\nhttps://docs.google.com/spreadsheets/d/1gGDKa3RvENbm2lrzlpu9R56wLA5GCejFbd7CBJdW0C4/edit?usp=sharing')
 
 
 if __name__ == "__main__":
