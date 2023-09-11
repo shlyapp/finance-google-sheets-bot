@@ -31,7 +31,7 @@ async def send_command_list(message: types.Message):
 @dp.message_handler(commands=['new'])
 async def add_new_entry(message: types.Message):
     await States.CHOOSE_TYPE.set()
-    await message.answer('Выберите тип (Продажа/Покупка):', reply_markup=entry_keyboard)
+    await message.answer('Выберите тип (Доход/Расход):', reply_markup=entry_keyboard)
 
 
 @dp.message_handler(state=States.CHOOSE_TYPE)

@@ -7,8 +7,8 @@ action_buttons = [
 ]
 
 entry_buttons = [
-    KeyboardButton("Продажа"),
-    KeyboardButton("Покупка")
+    KeyboardButton("Расход"),
+    KeyboardButton("Доход")
 ]
 
 sale_category_buttons = [
