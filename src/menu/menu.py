@@ -102,8 +102,8 @@ class CategoryMenu:
         elements = self._get_category_elements(category_id)
         reply_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         for element in elements:
-            reply_keyboard.add(KeyboardButton(element.name), self._remove_button)
-        reply_keyboard.add(self._add_button)
+            reply_keyboard.add(KeyboardButton(element.name))
+        #reply_keyboard.add(self._add_button)
         return reply_keyboard
 
     def get_type_menu(self):

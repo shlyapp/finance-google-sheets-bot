@@ -65,7 +65,12 @@ async def select_category(message: types.Message, state: FSMContext):
             await message.answer(f"Вы выбрали категорию: '{data['category']}'\n" + 
                                  "Пожалуйста, напишите сумму:")
     else:
-        await message.answer("Выберите категорию: ",
+        if message.text == "Удалить":
+            print("Удалить")
+        elif message.text == "Добавить кнопку":
+            print("Добавить кнопку")
+        else:
+            await message.answer("Выберите категорию: ",
                             reply_markup=keyboard)
 
 
