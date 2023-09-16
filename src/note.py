@@ -19,7 +19,7 @@ moscow_time = pytz.timezone('Europe/Moscow')
 
 def add_note(user_name, date, data):
     date = str(date.astimezone(moscow_time)).split("+")[0]
-    row = [user_name, date, data['type'], data['category'], int(data['price'])]
+    row = [user_name, date, data['type'], data['category'], int(data['price']), data['comment']]
     worksheet.append_row(row)
 
 

@@ -101,9 +101,13 @@ class CategoryMenu:
     def get_category_menu(self, category_id: int):
         elements = self._get_category_elements(category_id)
         reply_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        flag = True
         for element in elements:
             reply_keyboard.add(KeyboardButton(element.name))
-        #reply_keyboard.add(self._add_button)
+            if isinstance(element, Category) and int(element.parent_category_id) in [0, 1]:
+                flag = False
+        if flag:
+            reply_keyboard.add(KeyboardButton("Вернуться обратно"))
         return reply_keyboard
 
     def get_type_menu(self):

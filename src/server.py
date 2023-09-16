@@ -14,6 +14,7 @@ bot = Bot(token=str(os.getenv('TELEGRAM_API_TOKEN')))
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 menu = CategoryMenu()
+btn = types.KeyboardButton("Отмена")
 
 # Базовые команды
 
@@ -39,13 +40,17 @@ async def send_note_list(message: types.Message):
 @dp.message_handler(Command('new'))
 async def add_new_note(message: types.Message):
     await BotStates.SELECT_TYPE.set()
+    keyboard = menu.get_type_menu().add(types.KeyboardButton("Отмена"))
     await message.answer("Пожалуйста, выберите финансовый тип:", 
-                         reply_markup=menu.get_type_menu())
+                         reply_markup=keyboard)
 
 # Внесение данных
 
 @dp.message_handler(state=BotStates.SELECT_TYPE)
 async def select_type(message: types.Message, state: FSMContext):
+    if message.text == "Отмена":
+        await state.finish()
+        return
     async with state.proxy() as data:
         data['type'] = message.text
     await BotStates.SELECT_CATEGORY.set()
@@ -55,7 +60,15 @@ async def select_type(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=BotStates.SELECT_CATEGORY)
 async def select_category(message: types.Message, state: FSMContext):
-    keyboard = menu.get_category_menu(menu.get_category_id_by_name(message.text))
+    if message.text == "Отмена":
+        await state.finish()
+        return
+    if message.text == "Вернуться обратно":
+        async with state.proxy() as data:
+            keyboard = menu.get_category_menu(menu.get_category_id_by_name(data['type']))
+            await message.answer("Выберите категорию", reply_markup=keyboard)
+            return 
+    keyboard = menu.get_category_menu(menu.get_category_id_by_name(message.text)).add(btn)
     category_id = menu.get_category_id_by_name(message.text)
     is_item = True if category_id == -1 else False 
     if is_item:
@@ -63,7 +76,7 @@ async def select_category(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['category'] = message.text
             await message.answer(f"Вы выбрали категорию: '{data['category']}'\n" + 
-                                 "Пожалуйста, напишите сумму:")
+                                 "Пожалуйста, напишите сумму:", reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(btn))
     else:
         if message.text == "Удалить":
             print("Удалить")
@@ -76,25 +89,28 @@ async def select_category(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=BotStates.ENTER_VALUE)
 async def enter_value(message: types.Message, state: FSMContext):
-    while not message.text.isdigit():
+    if message.text == "Отмена":
+        await state.finish()
+        return
+
+    parts = message.text.split(" ", 1)
+
+    while not parts[0]:
         await message.reply("Некорректный ввод, пожалуйста, введите число:")
         return
 
     async with state.proxy() as data:
-        data['price'] = message.text
+        data['price'] = parts[0]
+        if len(parts) > 1:
+            data['comment'] = parts[1]
+        else:
+            data['comment'] = ""
         add_note(message.from_user.full_name, message.date, data)
-        await message.reply(f"{data['type']}, {data['category']}, {data['price']}")
+        await message.reply(f"{data['type']}, {data['category']}, {data['price']}, {data['comment']}")
 
     await state.finish()
-
-# Работа с меню
-
-async def add_menu_button(message: types.Message):
-    await message.answer("")
-
-
-async def delete_menu_button(message: types.Message):
-    await message.answer("")
+    await add_new_note(message)
+    return
 
 
 if __name__ == "__main__":
